@@ -6,7 +6,7 @@ Sphere::Sphere(const Vector3& center, double radius) : center(center), radius(ra
 
 Sphere::Sphere(const Sphere& sphere) : center(sphere.center), radius(sphere.radius) {}
 
-bool Sphere::intersect(const Ray& ray) const {
+bool Sphere::intersect(const Ray& ray, double t_min, double t_max, Vector3& normal) const {
     Vector3 oc = ray.origin - center;
 
     double a = ray.direction.dot(ray.direction);
@@ -15,5 +15,23 @@ bool Sphere::intersect(const Ray& ray) const {
 
     double discriminant = b * b - 4.0 * a * c;
 
-    return discriminant > 0;
+    if (discriminant > 0) {
+        double t = (-b - sqrt(discriminant)) / (2.0 * a);
+
+        if (t <= t_min || t >= t_max) {
+            t = (-b + sqrt(discriminant)) / (2.0 * a);
+
+            if (t <= t_min || t >= t_max) {
+                return true;
+            }
+        }
+
+        Vector3 point = ray(t);
+
+        normal = (point - center).normalize();
+        
+        return true;
+    }
+
+    return false;
 }

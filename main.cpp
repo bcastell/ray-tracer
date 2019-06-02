@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 #include "vector3.h"
 #include "ray.h"
@@ -8,8 +9,15 @@
 RGBColor ray_color(const Ray& ray) {
     Sphere sphere(Vector3(0.0, 0.0, -1.0), 0.5);
 
-    if (sphere.intersect(ray)) {
-        return RGBColor(Vector3(1.0, 0.0, 0.0));
+    double t_min = 0.0;
+    double t_max = std::numeric_limits<double>::max();
+
+    Vector3 normal;
+
+    if (sphere.intersect(ray, t_min, t_max, normal)) {
+        Vector3 mapped_normal = 0.5 * normal + Vector3(0.5, 0.5, 0.5);
+
+        return RGBColor(mapped_normal);
     }
 
     return RGBColor();
