@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include <limits>
+#include <chrono>
+#include <random>
 
 #include "vector3.h"
 #include "ray.h"
@@ -56,17 +58,30 @@ int main() {
     Vector3 u(img_plane_width, 0.0, 0.0);
     Vector3 v(0.0, -img_plane_height, 0.0);
 
+    int rays_per_px = 32;
+
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+
     for (int y = 0; y < img_height; ++y) {
-        double y_offset = (y + 0.5) / img_height;
-
         for (int x = 0; x < img_width; ++x) {
-            double x_offset = (x + 0.5) / img_width;
+            RGBColor px_color;
 
-            Vector3 px_center = top_left_corner + x_offset * u + y_offset * v; 
+            for (int r = 0; r < rays_per_px; ++r) {
+                double x_rand = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator);
+                double y_rand = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator);
 
-            Ray camera_ray(camera_origin, px_center);
+                double x_offset = (x + x_rand) / img_width;
+                double y_offset = (y + y_rand) / img_height;
 
-            RGBColor px_color = ray_color(camera_ray, scene);
+                Vector3 px_sample = top_left_corner + x_offset * u + y_offset * v;
+
+                Ray camera_ray(camera_origin, px_sample);
+
+                px_color += ray_color(camera_ray, scene);
+            }
+
+            px_color /= rays_per_px;
 
             std::cout << px_color.normalize(max_color) << "\n";
         }
