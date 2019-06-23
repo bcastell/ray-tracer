@@ -2,8 +2,7 @@
 #include <vector>
 #include <memory>
 #include <limits>
-#include <chrono>
-#include <random>
+#include <cstdint>
 
 #include "vector3.h"
 #include "ray.h"
@@ -12,6 +11,8 @@
 #include "rgbcolor.h"
 #include "scene.h"
 #include "intersection.h"
+#include "sampler.h"
+#include "randomsampler.h"
 
 RGBColor ray_color(const Ray& ray, const Scene& scene) {
     double t_min = 0.0;
@@ -58,32 +59,32 @@ int main() {
     Vector3 u(img_plane_width, 0.0, 0.0);
     Vector3 v(0.0, -img_plane_height, 0.0);
 
-    int rays_per_px = 32;
+    uint64_t rays_per_pixel = 32;
 
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::default_random_engine generator(seed);
+    std::shared_ptr<Sampler> sampler(new RandomSampler(rays_per_pixel));
 
     for (int y = 0; y < img_height; ++y) {
         for (int x = 0; x < img_width; ++x) {
-            RGBColor px_color;
+            RGBColor pixel_color;
 
-            for (int r = 0; r < rays_per_px; ++r) {
-                double x_rand = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator);
-                double y_rand = std::generate_canonical<double, std::numeric_limits<double>::digits>(generator);
+            sampler->sample_unit_square(Vector3(x, y, 0.0));
 
-                double x_offset = (x + x_rand) / img_width;
-                double y_offset = (y + y_rand) / img_height;
+            for (uint64_t r = 0; r < rays_per_pixel; ++r) {
+                Vector3 raster_space_sample = sampler->next_unit_square_sample();
 
-                Vector3 px_sample = top_left_corner + x_offset * u + y_offset * v;
+                double x_offset = raster_space_sample.x / img_width;
+                double y_offset = raster_space_sample.y / img_height;
 
-                Ray camera_ray(camera_origin, px_sample);
+                Vector3 screen_space_sample = top_left_corner + x_offset * u + y_offset * v;
 
-                px_color += ray_color(camera_ray, scene);
+                Ray camera_ray(camera_origin, screen_space_sample);
+
+                pixel_color += ray_color(camera_ray, scene);
             }
 
-            px_color /= rays_per_px;
+            pixel_color /= rays_per_pixel;
 
-            std::cout << px_color.normalize(max_color) << "\n";
+            std::cout << pixel_color.normalize(max_color) << "\n";
         }
     }
 }
