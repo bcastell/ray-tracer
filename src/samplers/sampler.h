@@ -9,9 +9,9 @@
 class Sampler {
     public:
         Sampler(uint64_t sample_count);
+        virtual ~Sampler();
 
         virtual void sample_unit_square(const Vector3& top_left_corner) = 0;
-
         Vector3 next_unit_square_sample();
 
     protected:

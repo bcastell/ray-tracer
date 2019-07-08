@@ -11,6 +11,7 @@ class Sphere : public Shape {
         Sphere();
         Sphere(const Vector3& center, double radius);
         Sphere(const Sphere& sphere);
+        ~Sphere();
 
         bool intersect(const Ray& ray, double t_min, double t_max, Intersection& intersection) const;
 

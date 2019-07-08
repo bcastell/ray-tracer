@@ -6,6 +6,8 @@ Sphere::Sphere(const Vector3& center, double radius) : center(center), radius(ra
 
 Sphere::Sphere(const Sphere& sphere) : center(sphere.center), radius(sphere.radius) {}
 
+Sphere::~Sphere() {}
+
 bool Sphere::intersect(const Ray& ray, double t_min, double t_max, Intersection& intersection) const {
     Vector3 oc = ray.origin - center;
 

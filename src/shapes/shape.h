@@ -6,6 +6,8 @@
 
 class Shape {
     public:
+        virtual ~Shape();
+
         virtual bool intersect(const Ray& ray, double t_min, double t_max, Intersection& intersection) const = 0;
 };
 

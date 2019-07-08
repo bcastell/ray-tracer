@@ -6,6 +6,8 @@ RandomSampler::RandomSampler(uint64_t sample_count) : Sampler(sample_count) {
     generator = std::default_random_engine(seed);
 }
 
+RandomSampler::~RandomSampler() {}
+
 void RandomSampler::sample_unit_square(const Vector3& top_left_corner) {
     sample_index = 0;
 
