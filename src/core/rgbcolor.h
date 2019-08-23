@@ -2,6 +2,7 @@
 #define RGBCOLOR_H
 
 #include <iostream>
+#include <math.h>
 
 #include "vector3.h"
 
@@ -29,6 +30,7 @@ class RGBColor {
         bool operator!=(const RGBColor& rgb) const;
 
         RGBColor normalize(int max_color) const;
+        RGBColor gamma_correct(double gamma) const;
 
         friend RGBColor operator*(double scalar, const RGBColor& rgb);
         friend std::ostream& operator<<(std::ostream& os, const RGBColor& rgb);

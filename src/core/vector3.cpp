@@ -94,6 +94,10 @@ double Vector3::length() const {
     return sqrt(x * x + y * y + z * z);
 }
 
+double Vector3::squared_length() const {
+    return length() * length();
+}
+
 double Vector3::dot(const Vector3& vec3) const {
     return x * vec3.x + y * vec3.y + z * vec3.z;
 }

@@ -13,20 +13,32 @@
 #include "intersection.h"
 #include "sampler.h"
 #include "randomsampler.h"
+#include "material.h"
+#include "lambertian.h"
 
-RGBColor ray_color(const Ray& ray, const Scene& scene) {
-    double t_min = 0.0;
+RGBColor ray_color(const Ray& ray, const Scene& scene, int depth) {
+    double t_min = 0.001;
     double t_max = std::numeric_limits<double>::max();
+
+    int depth_limit = 50;
 
     Intersection intersection;
 
     if (scene.intersect(ray, t_min, t_max, intersection)) {
-        Vector3 mapped_normal = 0.5 * intersection.normal + Vector3(0.5, 0.5, 0.5);
+        Ray scattered_ray;
 
-        return RGBColor(mapped_normal);
+        Vector3 attenuation;
+
+        if (depth < depth_limit && intersection.material->scatter(ray, intersection, attenuation, scattered_ray)) {
+            return RGBColor(attenuation) * ray_color(scattered_ray, scene, depth + 1);
+        }
+
+        return RGBColor();   
     }
 
-    return RGBColor();
+    double t = 0.5 * (ray.direction.normalize().y + 1.0);
+
+    return (1.0 - t) * RGBColor(Vector3(1.0, 1.0, 1.0)) + t * RGBColor(Vector3(0.5, 0.7, 1.0));
 }
 
 int main() {
@@ -40,8 +52,8 @@ int main() {
     std::cout << max_color << "\n";
 
     std::vector<std::shared_ptr<Shape>> objects = {
-        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, 0.0, -1.0), 0.5)),
-        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, -100.5, -1.0), 100.0))
+        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, 0.0, -1.0), 0.5, std::shared_ptr<Material>(new Lambertian(Vector3(0.8, 0.3, 0.3))))),
+        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, -100.5, -1.0), 100.0, std::shared_ptr<Material>(new Lambertian(Vector3(0.8, 0.8, 0.0)))))
     };
 
     Scene scene(objects);
@@ -58,6 +70,8 @@ int main() {
     Vector3 top_left_corner(-aspect_ratio, img_plane_height / 2.0, -camera_distance_to_img_plane);
     Vector3 u(img_plane_width, 0.0, 0.0);
     Vector3 v(0.0, -img_plane_height, 0.0);
+
+    double gamma = 1.0 / 2.2;
 
     uint64_t rays_per_pixel = 32;
 
@@ -79,10 +93,12 @@ int main() {
 
                 Ray camera_ray(camera_origin, screen_space_sample);
 
-                pixel_color += ray_color(camera_ray, scene);
+                pixel_color += ray_color(camera_ray, scene, 0);
             }
 
             pixel_color /= rays_per_pixel;
+
+            pixel_color = pixel_color.gamma_correct(gamma);
 
             std::cout << pixel_color.normalize(max_color) << "\n";
         }

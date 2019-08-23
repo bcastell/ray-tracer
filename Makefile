@@ -1,4 +1,4 @@
-MODULES = core main samplers shapes
+MODULES = core main materials samplers shapes
 
 CXX = g++
 CXXFLAGS = -std=c++11 -Wall $(addprefix -Isrc/, $(MODULES))
@@ -26,6 +26,9 @@ $(BUILD_DIR)/%.o: src/core/%.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
 $(BUILD_DIR)/%.o: src/main/%.cpp
+	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
+
+$(BUILD_DIR)/%.o: src/materials/%.cpp
 	$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
 $(BUILD_DIR)/%.o: src/samplers/%.cpp

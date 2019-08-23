@@ -11,6 +11,8 @@ class Ray {
 
         Vector3 operator()(double t) const;
 
+        Ray& operator=(const Ray& ray);
+
         Vector3 origin;
         Vector3 direction;
 };

@@ -76,6 +76,10 @@ RGBColor RGBColor::normalize(int max_color) const {
     return rgb.truncate();
 }
 
+RGBColor RGBColor::gamma_correct(double gamma) const {
+    return RGBColor(Vector3(pow(color.x, gamma), pow(color.y, gamma), pow(color.z, gamma)));
+}
+
 RGBColor operator*(double scalar, const RGBColor& rgb) {
     return rgb * scalar;
 }

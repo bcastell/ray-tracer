@@ -31,6 +31,7 @@ class Vector3 {
         bool operator!=(const Vector3& vec3) const;
 
         double length() const;
+        double squared_length() const;
         double dot(const Vector3& vec3) const;
         Vector3 normalize() const;
 

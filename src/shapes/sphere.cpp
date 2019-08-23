@@ -1,10 +1,6 @@
 #include "sphere.h"
 
-Sphere::Sphere() : center(Vector3(0.0, 0.0, 0.0)), radius(1.0) {}
-
-Sphere::Sphere(const Vector3& center, double radius) : center(center), radius(radius) {}
-
-Sphere::Sphere(const Sphere& sphere) : center(sphere.center), radius(sphere.radius) {}
+Sphere::Sphere(const Vector3& center, double radius, const std::shared_ptr<Material>& material) : center(center), radius(radius), material(material) {}
 
 Sphere::~Sphere() {}
 
@@ -31,6 +27,7 @@ bool Sphere::intersect(const Ray& ray, double t_min, double t_max, Intersection&
         intersection.t = t;
         intersection.point = ray(t);
         intersection.normal = (ray(t) - center).normalize();
+        intersection.material = material;
         
         return true;
     }
