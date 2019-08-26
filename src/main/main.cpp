@@ -15,6 +15,7 @@
 #include "randomsampler.h"
 #include "material.h"
 #include "lambertian.h"
+#include "metal.h"
 
 RGBColor ray_color(const Ray& ray, const Scene& scene, int depth) {
     double t_min = 0.001;
@@ -53,7 +54,9 @@ int main() {
 
     std::vector<std::shared_ptr<Shape>> objects = {
         std::shared_ptr<Shape>(new Sphere(Vector3(0.0, 0.0, -1.0), 0.5, std::shared_ptr<Material>(new Lambertian(Vector3(0.8, 0.3, 0.3))))),
-        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, -100.5, -1.0), 100.0, std::shared_ptr<Material>(new Lambertian(Vector3(0.8, 0.8, 0.0)))))
+        std::shared_ptr<Shape>(new Sphere(Vector3(0.0, -100.5, -1.0), 100.0, std::shared_ptr<Material>(new Lambertian(Vector3(0.8, 0.8, 0.0))))),
+        std::shared_ptr<Shape>(new Sphere(Vector3(1.0, 0.0, -1.0), 0.5, std::shared_ptr<Material>(new Metal(Vector3(0.8, 0.6, 0.2), 0.4)))),
+        std::shared_ptr<Shape>(new Sphere(Vector3(-1.0, 0.0, -1.0), 0.5, std::shared_ptr<Material>(new Metal(Vector3(0.8, 0.8, 0.8), 0.8))))
     };
 
     Scene scene(objects);
